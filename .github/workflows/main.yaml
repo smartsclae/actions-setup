@@ -1,0 +1,62 @@
+name: "Determine and Deploy Changed Applications"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+      # This is used to prevent multiple actions of the same workflow from running concurrently.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log PR Check
+        run: echo "PR Check stage - dummy operation"
+
+  detect-changes:
+    needs: pr-check
+    runs-on: ubuntu-latest
+    outputs:
+      api_pipeline: "dummy_api_pipeline"
+      adp_pipeline: "dummy_adp_pipeline"
+      identity_pipeline: "dummy_identity_pipeline"
+      api_changed: "false"
+      adp_changed: "false"
+      identity_changed: "true"
+    steps:
+      - name: Log Detect Changes
+        run: echo "Detect Changes stage - dummy operation"
+
+  deploy-api:
+    needs: [detect-changes]
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.api_changed == 'true'
+    environment: ${{ github.event_name == 'push' && 'development' || 'pr-to-development' }}
+    steps:
+      - name: Log Deploy API
+        run: echo "Deploy API stage - dummy operation"
+
+  deploy-adp:
+    needs: [detect-changes]
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.adp_changed == 'true'
+    environment: ${{ github.event_name == 'push' && 'development' || 'pr-to-development' }}
+    steps:
+      - name: Log Deploy ADP
+        run: echo "Deploy ADP stage - dummy operation"
+
+  deploy-identity:
+    needs: [detect-changes]
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.identity_changed == 'true'
+    environment: ${{ github.event_name == 'push' && 'development' || 'pr-to-development' }}
+    steps:
+      - name: Log Deploy Identity
+        run: echo "Deploy Identity stage - dummy operation"
